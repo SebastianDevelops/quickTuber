@@ -1,7 +1,5 @@
 import React from 'react';
 import { Card, CardBody } from '@progress/kendo-react-layout';
-import { Button } from '@progress/kendo-react-buttons';
-import { saveAs } from 'file-saver';
 
 interface SummaryAudioTabProps {
   audioUrl: string;
@@ -11,15 +9,6 @@ interface SummaryAudioTabProps {
 
 const SummaryAudioTab = React.forwardRef<HTMLAudioElement, SummaryAudioTabProps>(
   ({ audioUrl, transcript, formatTimestamp }, ref) => {
-
-    const handleExportTranscript = () => {
-      const transcriptText = transcript.map(t => 
-        `[${formatTimestamp(t.offset)}] ${t.text}`
-      ).join('\n');
-      const blob = new Blob([transcriptText], { type: 'text/plain;charset=utf-8' });
-      saveAs(blob, 'transcript.txt');
-    };
-
     return (
       <div className="summary-audio-tab">
         <Card className="audio-card">
