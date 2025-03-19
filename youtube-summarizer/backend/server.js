@@ -11,7 +11,7 @@ const { generateTextToVideo } = require('./services/ttvService');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.REACT_APP_PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
@@ -23,7 +23,13 @@ app.use('/services/audio', express.static(path.join(__dirname, 'audio'), {
     }
   }
 }));
-app.use(express.static(path.join(__dirname, "public")));
+const buildPath = path.join(__dirname, 'build')
+
+
+app.use(express.static(buildPath));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(buildPath, 'index.html'))
+});
 
 app.post(
   '/api/summarize',

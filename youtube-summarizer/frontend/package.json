@@ -1,6 +1,10 @@
 {
   "name": "frontend",
   "version": "0.1.0",
+  "engines": {
+  "npm": "10.9.1",
+  "node": "22.11.0"
+  },
   "private": true,
   "dependencies": {
     "@progress/kendo-react-buttons": "^10.0.0",

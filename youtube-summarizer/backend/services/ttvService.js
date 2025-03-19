@@ -1,7 +1,7 @@
 const Creatomate = require('creatomate');
 
 const url = 'https://api.creatomate.com/v1/renders';
-const apiKey = process.env.TTV_API_KEY;
+const apiKey = process.env.REACT_APP_TTV_API_KEY;
 
 const client = new Creatomate.Client(apiKey);
 

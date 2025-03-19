@@ -5,7 +5,7 @@ const { Readable } = require('stream');
 const { promisify } = require('util');
 
 async function generateWithDeepgram(text) {
-  const apiKey = process.env.DEEPGRAM_API_KEY;
+  const apiKey = process.env.REACT_APP_DEEPGRAM_API_KEY;
   
   if (!apiKey) {
     throw new Error('Deepgram API key not configured');

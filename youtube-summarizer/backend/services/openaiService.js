@@ -1,7 +1,7 @@
 const { Configuration, OpenAIApi } = require("azure-openai");
 
-const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
-const apiKey = process.env.OPENAI_API_KEY;
+const endpoint = process.env.REACT_APP_AZURE_OPENAI_ENDPOINT;
+const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
 const deploymentName = 'gpt-4o';
 
 const configuration = new Configuration({

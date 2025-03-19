@@ -4,7 +4,7 @@ const fs = require('fs');
 const { promisify } = require('util');
 const pipeline = promisify(require('stream').pipeline);
 
-const openai = new OpenAI({ apiKey: process.env.WHISPER_API_KEY });
+const openai = new OpenAI({ apiKey: process.env.REACT_APP_WHISPER_API_KEY });
 const MAX_DURATION = 15 * 60;
 
 async function getYoutubeTranscript(url) {
