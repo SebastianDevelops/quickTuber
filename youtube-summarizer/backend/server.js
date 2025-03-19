@@ -13,7 +13,12 @@ const path = require('path');
 const app = express();
 const PORT = process.env.REACT_APP_PORT || 5000;
 
-app.use(cors());
+const corsOptions = {
+  origin: 'https://quick-tuber-frontend.onrender.com',
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(morgan('dev'));
 app.use('/services/audio', express.static(path.join(__dirname, 'audio'), {
