@@ -1,5 +1,5 @@
 require('dotenv').config();
-require('dotenv').config({ path: '.env.local' });
+//require('dotenv').config({ path: '.env.local' });
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
@@ -23,13 +23,6 @@ app.use('/services/audio', express.static(path.join(__dirname, 'audio'), {
     }
   }
 }));
-const buildPath = path.join(__dirname, 'build')
-
-
-app.use(express.static(buildPath));
-app.get('*', (req, res) => {
-  res.sendFile(path.join(buildPath, 'index.html'))
-});
 
 app.post(
   '/api/summarize',
