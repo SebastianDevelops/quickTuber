@@ -1,0 +1,173 @@
+/* Center everything like a login card */
+.app-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background: var(--kendo-body-bg, #f5f5f5);
+}
+
+/* Style the card like a login form */
+.main-card {
+  width: 100%;
+  max-width: 700px; /* Adjusted for a compact login card feel */
+  padding: 20px;
+  background: var(--kendo-component-bg, #fff);
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  text-align: center; /* Ensures inner content is centered */
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Space between logo and text */
+}
+
+/* Style the logo */
+.app-logo {
+  height: 80px; /* Adjust size as needed */
+  width: auto;
+}
+
+.k-animation-container-relative {
+  position: relative;
+  display: block !important;
+}
+
+/* Ensure form elements are full width */
+.url-input {
+  width: 100%;
+}
+
+.submit-button {
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* Adjust dark mode for better contrast */
+.dark-mode .main-card {
+  background-color: var(--kendo-component-bg, #363636);
+  color: var(--kendo-component-text, #fff);
+}
+
+/* Summary Tab Styles */
+.summary-text-tab,
+.summary-audio-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* Center the summary card and ensure a good max width */
+.summary-card,
+.audio-card {
+  width: 100%;
+  max-width: 500px;
+  padding: 20px;
+  background: var(--kendo-component-bg, #fff);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: left;
+}
+
+/* Ensure summary text is readable */
+.summary-content {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--kendo-component-text, #333);
+  text-align: left;
+}
+
+.summary-content p {
+  margin-bottom: 1em;
+}
+
+/* Center the audio player */
+.audio-player-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
+}
+
+/* Style the audio element */
+.audio-element {
+  width: 100%;
+  max-width: 400px;
+  height: 50px;
+  border-radius: 5px;
+}
+
+/* Export Actions - Ensure spacing for buttons */
+.export-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+/* Adjust for Dark Mode */
+.dark-mode .summary-card,
+.dark-mode .audio-card {
+  background-color: var(--kendo-component-bg, #363636);
+  color: var(--kendo-component-text, #fff);
+}
+
+.dark-mode .summary-content {
+  color: var(--kendo-component-text, #ddd);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 600px) {
+  .summary-card,
+  .audio-card {
+    max-width: 100%;
+    padding: 15px;
+  }
+
+  .audio-element {
+    height: 40px;
+  }
+}
+
+.video-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.generate-video-button {
+  display: block;
+  margin: 20px auto;
+}
+
+.video-player {
+  width: 100%;
+  max-width: 350px;
+  aspect-ratio: 9/16;
+  object-fit: contain;
+}
+
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+}
+
+.error-message {
+  color: #e74c3c;
+  text-align: center;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 4px;
+  background-color: rgba(231, 76, 60, 0.1);
+}
