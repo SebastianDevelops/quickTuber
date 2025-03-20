@@ -1,5 +1,5 @@
 require('dotenv').config();
-//require('dotenv').config({ path: '.env.local' });
+require('dotenv').config({ path: '.env.local' });
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
@@ -8,6 +8,7 @@ const { getYoutubeTranscript } = require('./services/youtubeService');
 const { summarizeText } = require('./services/openaiService');
 const { generateSpeech } = require('./services/ttsService');
 const { generateTextToVideo } = require('./services/ttvService');
+const { mapTranscriptForGrid } = require('./uitls/transcriptGridHelper')
 const path = require('path');
 
 const app = express();
@@ -21,13 +22,6 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(morgan('dev'));
-app.use('/services/audio', express.static(path.join(__dirname, 'audio'), {
-  setHeaders: (res, path) => {
-    if (path.endsWith('.mp3')) {
-      res.set('Content-Type', 'audio/mpeg');
-    }
-  }
-}));
 
 app.post(
   '/api/summarize',
@@ -47,10 +41,12 @@ app.post(
       console.log(`Processing video: ${url}`);
 
       const transcript = await getYoutubeTranscript(url);
+      console.log('Transcript:', transcript);
       if (!transcript || transcript.length === 0) {
         return res.status(404).json({ error: 'Transcript not available for this video' });
       }
 
+      const formattedTranscript = mapTranscriptForGrid(transcript);
       const fullText = transcript.map(segment => segment.text).join(' ');
       const summary = await summarizeText(fullText, {
         maxLength: options.maxLength || 12000,
@@ -61,7 +57,7 @@ app.post(
       const base64Audio = audioData.toString('base64');
       res.json({
         success: true,
-        transcript: transcript,
+        transcript: formattedTranscript,
         summary: summary,
         audio_url: `data:audio/mpeg;base64,${base64Audio}`,
         metadata: {

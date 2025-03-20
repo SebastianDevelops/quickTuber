@@ -1,92 +1,84 @@
 const ytdl = require("@distube/ytdl-core");
 const { OpenAI } = require('openai');
 const fs = require('fs');
+const axios = require('axios');
 const { promisify } = require('util');
 const pipeline = promisify(require('stream').pipeline);
 
-const openai = new OpenAI({ apiKey: process.env.REACT_APP_WHISPER_API_KEY });
-const MAX_DURATION = 15 * 60;
-const agent = ytdl.createProxyAgent({ uri: "http://152.26.229.66:9443" });
+const options = {
+  method: 'GET',
+  url: 'https://youtube-media-downloader.p.rapidapi.com/v2/video/details',
+  params: {
+    videoId: ''
+  },
+  headers: {
+    'x-rapidapi-key': process.env.REACT_APP_RAPIDAPI_KEY,
+    'x-rapidapi-host': 'youtube-media-downloader.p.rapidapi.com'
+  }
+};
+const MAX_DURATION = 15;
 
 async function getYoutubeTranscript(url) {
   try {
-    const duration = await getVideoDuration(url);
-    
+    const videoId = parseVideoId(url);
+    const videoDetails = await getVideoDetails(videoId);
+    const duration = videoDetails.lengthSeconds / 60;
+    const subtitlesUrl = videoDetails.subtitles.items[0].url;
+
     if (duration > MAX_DURATION) {
-      throw new Error(`Video exceeds 15 minute limit (${Math.round(duration/60)}m)`);
+      throw new Error(`Video exceeds 15 minute limit (${Math.round(duration)}m)`);
     }
 
-    return await getTranscriptWithWhisperSDK(url);
+    if(!subtitlesUrl)
+    {
+      throw new Error('No subtitles available for this video');
+    }
+
+    return await getGenTranscript(subtitlesUrl);
   } catch (error) {
     if (error.message.includes('exceeds 15 minute limit')) throw error;
     console.error('Primary method failed:', error.message);
   }
 }
 
-async function getVideoDuration(url) {
-  try {
-    ytdl.getBasicInfo(url, {agent}).then(info => {
+function parseVideoId(url) {
+  const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/;
+  const matches = url.match(regex);
+  return matches ? matches[1] : null;
+}
 
-      if (!info.videoDetails.lengthSeconds) {
-        throw new Error('Duration not available for this video');
-      }
-      console.log('Duration:', info.videoDetails.lengthSeconds);
-      return parseInt(info.videoDetails.lengthSeconds);
-    });
+async function getVideoDetails(videoId) {
+  try {
+    options.params.videoId = videoId;
+
+    const response = await axios.request(options);
+
+    return response.data;
   } catch (error) {
-    console.error('Duration check failed:', error.message);
-    throw new Error(`Could not verify video duration: ${error.message}`);
+    console.error('Getting video details failed:', error.message);
+    throw new Error(`Could not get video details: ${error.message}`);
   }
 }
 
-async function getTranscriptWithWhisperSDK(url) {
-  let tempFilePath;
-  try {
-    const audioStream = ytdl(url, {
-      filter: 'audioonly',
-      agent,
-      quality: 'highestaudio',
-      requestOptions: { 
-        headersTimeout: 1000 * 10,
-        bodyTimeout: 1000 * 10,
-        headers: {
-          referer: 'https://www.youtube.com',
-        }
-      }
-    });
-
-    const duration = await getVideoDuration(url);
-    if (duration > MAX_DURATION) {
-      throw new Error(`Video exceeds 15 minute limit (${Math.round(duration/60)}m)`);
+async function getGenTranscript(subtitlesUrl) {
+  const transcriptOptions = {
+    method: 'GET',
+    url: 'https://youtube-media-downloader.p.rapidapi.com/v2/video/subtitles',
+    params: {
+      subtitleUrl: subtitlesUrl, 
+      format: 'json'
+    },
+    headers: {
+      'x-rapidapi-key': process.env.REACT_APP_RAPIDAPI_KEY,
+      'x-rapidapi-host': 'youtube-media-downloader.p.rapidapi.com'
     }
-    var videoTitle;
-    ytdl.getBasicInfo(url).then(info => {
-      videoTitle = info.videoDetails.title;
-    });
-    tempFilePath = `./temp_${videoTitle}.mp3`;
-    await pipeline(audioStream, fs.createWriteStream(tempFilePath));
-
-    const transcription = await openai.audio.transcriptions.create({
-      file: fs.createReadStream(tempFilePath),
-      model: "whisper-1",
-      response_format: "verbose_json",
-    });
-
-    console.log('Transcription:', transcription);
-
-    return transcription.segments.map(segment => ({
-      text: segment.text,
-      offset: segment.start * 1000,
-      duration: (segment.end - segment.start) * 1000
-    }));
+  };
+  try {
+    const response = await axios.request(transcriptOptions);
+    return response.data;
   } catch (error) {
-    console.error('Whisper Error:', error);
     throw error.message.includes('exceeds') ? error : 
       new Error('Transcription failed: ' + error.message);
-  } finally {
-    if (tempFilePath && fs.existsSync(tempFilePath)) {
-      fs.unlinkSync(tempFilePath);
-    }
   }
 }
 
