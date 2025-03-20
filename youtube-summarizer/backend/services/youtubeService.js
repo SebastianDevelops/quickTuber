@@ -6,7 +6,7 @@ const pipeline = promisify(require('stream').pipeline);
 
 const openai = new OpenAI({ apiKey: process.env.REACT_APP_WHISPER_API_KEY });
 const MAX_DURATION = 15 * 60;
-const agent = ytdl.createProxyAgent({ uri: "my.proxy.server" });
+const agent = ytdl.createProxyAgent({ uri: "http://152.26.229.66:9443" });
 
 async function getYoutubeTranscript(url) {
   try {
