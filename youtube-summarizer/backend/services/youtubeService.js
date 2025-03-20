@@ -6,6 +6,7 @@ const pipeline = promisify(require('stream').pipeline);
 
 const openai = new OpenAI({ apiKey: process.env.REACT_APP_WHISPER_API_KEY });
 const MAX_DURATION = 15 * 60;
+const agent = ytdl.createProxyAgent({ uri: "my.proxy.server" });
 
 async function getYoutubeTranscript(url) {
   try {
@@ -24,7 +25,7 @@ async function getYoutubeTranscript(url) {
 
 async function getVideoDuration(url) {
   try {
-    ytdl.getBasicInfo(url).then(info => {
+    ytdl.getBasicInfo(url, {agent}).then(info => {
 
       if (!info.videoDetails.lengthSeconds) {
         throw new Error('Duration not available for this video');
@@ -43,7 +44,15 @@ async function getTranscriptWithWhisperSDK(url) {
   try {
     const audioStream = ytdl(url, {
       filter: 'audioonly',
+      agent,
       quality: 'highestaudio',
+      requestOptions: { 
+        headersTimeout: 1000 * 10,
+        bodyTimeout: 1000 * 10,
+        headers: {
+          referer: 'https://www.youtube.com',
+        }
+      }
     });
 
     const duration = await getVideoDuration(url);
